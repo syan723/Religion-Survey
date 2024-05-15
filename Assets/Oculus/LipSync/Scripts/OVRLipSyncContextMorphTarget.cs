@@ -183,7 +183,7 @@ public class OVRLipSyncContextMorphTarget : MonoBehaviour
 
             // Threshold then re-map to [0,1]
             laughterScore = laughterScore < laughterThreshold ? 0.0f : laughterScore - laughterThreshold;
-            laughterScore = Mathf.Min(laughterScore * laughterMultiplier, 1.0f);
+            laughterScore = Mathf.Min(laughterScore * laughterMultiplier, 100.0f);
             laughterScore *= 1.0f / laughterThreshold;
 
             skinnedMeshRenderer.SetBlendShapeWeight(
