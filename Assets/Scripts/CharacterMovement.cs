@@ -1,6 +1,7 @@
 using UnityEngine;
 using Oculus.Platform;
 using Oculus.Platform.Models;
+using static OVRInput;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -16,10 +17,11 @@ public class CharacterMovement : MonoBehaviour
 
     void Update()
     {
-        // Get the right analog stick input
-        Vector2 rightStickInput = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+        // Get the input from both analog sticks
+        Vector2 rightStickInput = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick);
+        Vector2 leftStickInput = OVRInput.Get(OVRInput.RawAxis2D.LThumbstick);
 
-        // Calculate the movement direction relative to the camera's facing direction
+        // Calculate the movement direction relative to the camera's facing direction for each stick
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
 
@@ -30,10 +32,15 @@ public class CharacterMovement : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        // Calculate the desired movement direction
-        Vector3 desiredMoveDirection = (forward * rightStickInput.y + right * rightStickInput.x) * speed * Time.deltaTime;
+        // Calculate the desired movement direction for each stick
+        Vector3 desiredMoveDirectionRight = (forward * rightStickInput.y + right * rightStickInput.x) * speed * Time.deltaTime;
+        Vector3 desiredMoveDirectionLeft = (forward * leftStickInput.y + right * leftStickInput.x) * speed * Time.deltaTime;
 
-        // Apply the movement, but keep the Y position fixed
-        transform.position = new Vector3(transform.position.x + desiredMoveDirection.x, fixedY, transform.position.z + desiredMoveDirection.z);
+        // Apply the movement for each stick, but keep the Y position fixed
+        transform.position += new Vector3(desiredMoveDirectionRight.x, 0, desiredMoveDirectionRight.z);
+        transform.position += new Vector3(desiredMoveDirectionLeft.x, 0, desiredMoveDirectionLeft.z);
+
+        // Ensure the Y position remains fixed
+        transform.position = new Vector3(transform.position.x, fixedY, transform.position.z);
     }
 }
