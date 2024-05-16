@@ -25,4 +25,13 @@ public class MenuManager : MonoBehaviour
         isSTD = typeSTD;
         SceneManager.LoadScene("Main");
     }
+
+    [ContextMenu("Open main")]
+    public void InspectorStart()
+    {
+        SetCharacterIndex(1);
+        SetQuestiontype(true);
+        SceneManager.LoadScene("Main");
+
+    }
 }

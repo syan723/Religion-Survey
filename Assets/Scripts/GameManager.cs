@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public AudioClip[] STD;
@@ -15,21 +15,48 @@ public class GameManager : MonoBehaviour
     private AudioClip[] currentClips;
     private int currentIndex = 0;
     public GameObject[] medals;
-
+    public Animator animator;
 
     void Start()
     {
+        animator = player.GetComponent<Animator>();
         audioSource = player.GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource component not found on player GameObject.");
+        }
+
+        if (animator == null)
+        {
+            Debug.LogError("Animator component not assigned in the Inspector.");
+        }
+
         isSTD = MenuManager.singleTon.isSTD;
         charIndex = MenuManager.singleTon.characterIndex;
-        if(charIndex != 0)
+
+        if (charIndex != 0)
         {
-            medals[charIndex-1].SetActive(true);
+            if (charIndex - 1 < medals.Length)
+            {
+                medals[charIndex - 1].SetActive(true);
+            }
+            else
+            {
+                Debug.LogError("charIndex is out of bounds of the medals array.");
+            }
         }
+
         UpdateCurrentClips();
         PlayCurrentClip();
         UpdateButtonStates();
-        
+    }
+
+    void Update()
+    {
+        if (!audioSource.isPlaying && !audioSource.loop)
+        {
+            OnAudioSourceStopped();
+        }
     }
 
     void UpdateCurrentClips()
@@ -48,6 +75,11 @@ public class GameManager : MonoBehaviour
 
     public void NextClip()
     {
+        Debug.LogError("Next");
+        if (animator != null)
+        {
+            animator.SetInteger("val", 0);
+        }
         if (currentIndex < currentClips.Length - 1)
         {
             currentIndex++;
@@ -58,6 +90,11 @@ public class GameManager : MonoBehaviour
 
     public void PreviousClip()
     {
+        Debug.LogError("Previous");
+        if (animator != null)
+        {
+            animator.SetInteger("val", 0);
+        }
         if (currentIndex > 0)
         {
             currentIndex--;
@@ -70,5 +107,18 @@ public class GameManager : MonoBehaviour
     {
         previousButton.gameObject.SetActive(currentIndex > 0);
         nextButton.gameObject.SetActive(currentIndex < currentClips.Length - 1);
+    }
+
+    void OnAudioSourceStopped()
+    {
+        if (animator != null)
+        {
+            animator.SetInteger("val", 1);
+        }
+        Debug.Log("Audio source stopped playing");
+    }
+    public void GoMainMenu()
+    {
+        SceneManager.LoadScene("Menu");
     }
 }
